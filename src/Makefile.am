@@ -151,10 +151,12 @@ INCLUDES = \
 
 if NATIVE_WIN32
 SYLPHEED_RES = sylpheed.res
+sylpheed_LDFLAGS = -mwindows
 sylpheed.res: sylpheed.rc icons/sylpheed.ico sylpheed.exe.manifest
 	$(WINDRES) $< -O coff -o $@
 else
 SYLPHEED_RES = 
+sylpheed_LDFLAGS = 
 endif
 
 sylpheed_LDADD = \
@@ -163,7 +165,7 @@ sylpheed_LDADD = \
 	$(GLIB_LIBS) \
 	$(GPGME_LIBS) \
 	$(LDAP_LIBS) \
-	$(LIBICONV) \
+	$(LTLIBICONV) \
 	$(SYLPHEED_LIBS) \
 	libsylpheed-plugin-0.la \
 	../libsylph/libsylph-0.la \
@@ -171,7 +173,7 @@ sylpheed_LDADD = \
 
 syl_auth_helper_LDADD = \
 	$(GLIB_LIBS) \
-	$(LIBICONV) \
+	$(LTLIBICONV) \
 	$(CURL_LIBS) \
 	../libsylph/libsylph-0.la
 

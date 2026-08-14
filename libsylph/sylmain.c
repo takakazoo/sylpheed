@@ -263,28 +263,48 @@ void syl_init(void)
 void syl_init_gettext(const gchar *package, const gchar *dirname)
 {
 #ifdef ENABLE_NLS
+	gchar *locale_dir = NULL;
+
+#ifdef G_OS_WIN32
+	locale_dir = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S,
+				 "share", G_DIR_SEPARATOR_S, "locale", NULL);
+	if (!is_dir_exist(locale_dir)) {
+		g_free(locale_dir);
+		locale_dir = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S,
+					 "..", G_DIR_SEPARATOR_S,
+					 "..", G_DIR_SEPARATOR_S,
+					 "share", G_DIR_SEPARATOR_S, "locale", NULL);
+	}
+	if (!is_dir_exist(locale_dir)) {
+		g_free(locale_dir);
+		if (g_path_is_absolute(dirname))
+			locale_dir = g_strdup(dirname);
+		else
+			locale_dir = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S,
+						 dirname, NULL);
+	}
+	{
+		gchar *locale_dir_;
+
+		locale_dir_ = g_locale_from_utf8(locale_dir, -1,
+						 NULL, NULL, NULL);
+		if (locale_dir_) {
+			g_free(locale_dir);
+			locale_dir = locale_dir_;
+		}
+	}
+	bindtextdomain(package, locale_dir);
+	g_free(locale_dir);
+#else
 	if (g_path_is_absolute(dirname))
 		bindtextdomain(package, dirname);
 	else {
-		gchar *locale_dir;
-
 		locale_dir = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S,
 					 dirname, NULL);
-#ifdef G_OS_WIN32
-		{
-			gchar *locale_dir_;
-
-			locale_dir_ = g_locale_from_utf8(locale_dir, -1,
-							 NULL, NULL, NULL);
-			if (locale_dir_) {
-				g_free(locale_dir);
-				locale_dir = locale_dir_;
-			}
-		}
-#endif /* G_OS_WIN32 */
 		bindtextdomain(package, locale_dir);
 		g_free(locale_dir);
 	}
+#endif
 
 	bind_textdomain_codeset(package, CS_UTF_8);
 #endif /* ENABLE_NLS */
