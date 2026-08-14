@@ -103,6 +103,12 @@ void ssl_init(void)
 		certs_file = find_certs_file(certs_dir);
 
 	if (!certs_file) {
+		const gchar *env_cert = g_getenv("SSL_CERT_FILE");
+		if (env_cert && is_file_exist(env_cert))
+			certs_file = g_strdup(env_cert);
+	}
+
+	if (!certs_file) {
 #ifdef G_OS_WIN32
 		certs_dir = g_strconcat(get_startup_dir(),
 					G_DIR_SEPARATOR_S "etc"
@@ -116,6 +122,16 @@ void ssl_init(void)
 			certs_file = find_certs_file(certs_dir);
 			g_free(certs_dir);
 			certs_dir = NULL;
+		}
+		if (!certs_file) {
+			certs_dir = g_strconcat(get_startup_dir(),
+						G_DIR_SEPARATOR_S "certs", NULL);
+			certs_file = find_certs_file(certs_dir);
+			g_free(certs_dir);
+			certs_dir = NULL;
+		}
+		if (!certs_file && is_file_exist("C:\\msys64\\mingw64\\etc\\ssl\\certs\\ca-bundle.crt")) {
+			certs_file = g_strdup("C:\\msys64\\mingw64\\etc\\ssl\\certs\\ca-bundle.crt");
 		}
 #else
 		certs_file = find_certs_file("/etc/ssl");

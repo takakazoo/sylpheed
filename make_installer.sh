@@ -83,6 +83,14 @@ if [ -f /mingw64/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ]; then
     cp /mingw64/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache "$DIST_DIR/lib/gdk-pixbuf-2.0/2.10.0/"
 fi
 
+# SSL Root CA Certificates
+mkdir -p "$DIST_DIR/etc/ssl/certs"
+if [ -f /mingw64/etc/ssl/certs/ca-bundle.crt ]; then
+    cp /mingw64/etc/ssl/certs/ca-bundle.crt "$DIST_DIR/etc/ssl/certs/"
+elif [ -f /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem ]; then
+    cp /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem "$DIST_DIR/etc/ssl/certs/ca-bundle.crt"
+fi
+
 echo "=========================================="
 echo " 4. Collecting DLL dependencies"
 echo "=========================================="
