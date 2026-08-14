@@ -60,7 +60,7 @@ SetCompressor /SOLID lzma
 
 ; Reserve files
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
-ReserveFile "${NSISDIR}\Plugins\nsProcess.dll"
+; ReserveFile "${NSISDIR}\Plugins\nsProcess.dll"
 
 ; MUI end ------
 
@@ -143,12 +143,12 @@ SectionGroupEnd
 
 ${MementoSection} "sylfilter" sec_sylfilter
   SetOutPath "$INSTDIR"
-  File /r "sylfilter\"
+  File /nonfatal /r "sylfilter\"
 ${MementoSectionEnd}
 
 ${MementoSection} "bsfilter" sec_bsfilter
   SetOutPath "$INSTDIR"
-  File /r "bsfilter\"
+  File /nonfatal /r "bsfilter\"
 ${MementoSectionEnd}
 
 ${MementoSection} "$(desktop_shortcut)" sec_desktop_shortcut

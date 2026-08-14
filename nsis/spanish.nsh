@@ -1,11 +1,11 @@
 LicenseLangString license ${LANG_SPANISH} "COPYING.txt"
 LangString readme  ${LANG_SPANISH}  "Ver README"
-LangString jump  ${LANG_SPANISH}  "Ver la página web de ${INST_NAME}"
+LangString jump  ${LANG_SPANISH}  "Ver la pÃ¡gina web de ${INST_NAME}"
 LangString plugins ${LANG_SPANISH} "Sylpheed Plug-ins"
 LangString attachment_tool_plugin ${LANG_SPANISH} "attachment_tool"
 LangString autoenc_plugin ${LANG_SPANISH} "autoenc plugin"
 LangString desktop_shortcut ${LANG_SPANISH} "Acceso directo en el escritorio"
-LangString quick_shortcut ${LANG_SPANISH} "Acceso directo en la barra rápida"
+LangString quick_shortcut ${LANG_SPANISH} "Acceso directo en la barra rÃ¡pida"
 LangString handler ${LANG_SPANISH} "Mantener asociado al protocolo mailto:"
 LangString sylpheed_description ${LANG_SPANISH} "el propio Sylpheed"
 LangString plugins_description ${LANG_SPANISH} "Plug-ins for Sylpheed"
@@ -14,9 +14,9 @@ LangString attachment_tool_plugin_description ${LANG_SPANISH} "attachment_tool P
 LangString autoenc_plugin_description ${LANG_SPANISH} "autoenc Plug-in"
 LangString sylfilter_description ${LANG_SPANISH} "SylFilter bayesian spam filter"
 LangString bsfilter_description ${LANG_SPANISH} "bsfilter bayesian spam filter"
-LangString desktop_shortcut_description ${LANG_SPANISH} "Se realizó el acceso directo al escritorio."
-LangString quick_shortcut_description ${LANG_SPANISH} "Se realizó el acceso directo a la barra rápida. "
-LangString handler_description ${LANG_SPANISH} "Se iniciará Sylpheed cuando se haga clic en \
+LangString desktop_shortcut_description ${LANG_SPANISH} "Se realizÃ³ el acceso directo al escritorio."
+LangString quick_shortcut_description ${LANG_SPANISH} "Se realizÃ³ el acceso directo a la barra rÃ¡pida. "
+LangString handler_description ${LANG_SPANISH} "Se iniciarÃ¡ Sylpheed cuando se haga clic en \
   los enlaces mailto: del navegador web y similares."
 LangString un_sylpheed_description ${LANG_SPANISH} "el propio Sylpheed"
 LangString un_plugins_description ${LANG_SPANISH} "Plug-ins for Sylpheed"
@@ -27,9 +27,9 @@ LangString un_sylfilter_description ${LANG_SPANISH} "SylFilter bayesian spam fil
 LangString un_bsfilter_description ${LANG_SPANISH} "bsfilter bayesian spam filter"
 LangString un_desktop_shortcut_description ${LANG_SPANISH} "Delete shortcut for Desktop (current user only)"
 LangString un_quick_shortcut_description ${LANG_SPANISH} "Delete shortcut for Quick Launch (current user only)"
-LangString delete_caution ${LANG_SPANISH} "${PRODUCT_NAME} ya está instalado. $\n$\nPulse «Aceptar» para \
-  eliminar la versión anterior o «Cancelar» para cancelar la actualización. $\n$\n\
-  Tenga en cuenta que todos los ficheros existentes en $INSTDIR serán eliminados. "
+LangString delete_caution ${LANG_SPANISH} "${PRODUCT_NAME} ya estÃ¡ instalado. $\n$\nPulse Â«AceptarÂ» para \
+  eliminar la versiÃ³n anterior o Â«CancelarÂ» para cancelar la actualizaciÃ³n. $\n$\n\
+  Tenga en cuenta que todos los ficheros existentes en $INSTDIR serÃ¡n eliminados. "
 LangString app_running ${LANG_SPANISH} "Sylpheed is running. Please quit Sylpheed before installing."
 LangString app_running_uninst ${LANG_SPANISH} "Sylpheed is running. Please quit Sylpheed before uninstalling."
 

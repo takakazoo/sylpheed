@@ -44,7 +44,7 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ;Only useful for BZIP2 compression
 ;Use ReserveFile for your own InstallOptions INI files too!
 
-ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
+; ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
 
 RequestExecutionLevel admin
 XPStyle on
