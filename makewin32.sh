@@ -1,19 +1,20 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
-export PATH=$PATH:/target/bin
-export LIBRARY_PATH=$LIBRARY_PATH:/target/lib:/usr/local/lib
-export C_INCLUDE_PATH=$C_INCLUDE_PATH:/target/include:/usr/local/include
+# Sylpheed Windows build and packaging helper for MSYS2 / MinGW-w64
 
-(
+TOP_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$TOP_DIR"
 
-./configure --prefix=$HOME/dist \
-  --with-localedir=share/locale \
-  --with-themedir=share/icons \
-  --enable-oniguruma --enable-threads \
-  'CC=gcc -mthreads -mtune=core2 -static-libgcc' CFLAGS=-O3 \
-  && make \
-  && make install-strip \
-  && (cd plugin/attachment_tool; make install-plugin) \
-  && strip $HOME/dist/lib/sylpheed/plugins/attachment_tool.dll
+echo "=== 1. Generating build configuration ==="
+if [ ! -f Makefile ]; then
+    ./autogen.sh --enable-oniguruma --enable-threads --enable-ssl --enable-gpgme
+fi
 
-) 2>&1 | tee sylpheed-build.log
+echo "=== 2. Building Sylpheed and Plugins ==="
+make -j$(nproc 2>/dev/null || echo 4)
+
+echo "=== 3. Creating Windows Installer ==="
+./make_installer.sh
+
+echo "=== Windows build and packaging completed successfully! ==="
