@@ -512,27 +512,26 @@ static void fix_font_setting(void)
 	g_free(style);	
 	g_free(size);
 #ifdef G_OS_WIN32
-	str = g_strconcat("MS Gothic ", suffix, NULL);
+	str = g_strconcat("Yu Gothic ", suffix, NULL);
+	if (!gtkut_font_can_load(str)) {
+		g_free(str);
+		str = g_strconcat("Meiryo ", suffix, NULL);
+		if (!gtkut_font_can_load(str)) {
+			g_free(str);
+			str = g_strconcat("MS Gothic ", suffix, NULL);
+			if (!gtkut_font_can_load(str)) {
+				g_free(str);
+				str = NULL;
+			}
+		}
+	}
 #else /* __APPLE__ */
 	str = g_strconcat("Hiragino Kaku Gothic Pro ", suffix, NULL);
-#endif
-
 	if (!gtkut_font_can_load(str)) {
-#ifdef G_OS_WIN32
-		debug_print("font '%s' load failed\n", str);
-		g_free(str);
-		str = g_strconcat("\xef\xbc\xad\xef\xbc\xb3 \xe3\x82\xb4\xe3\x82\xb7\xe3\x83\x83\xe3\x82\xaf ", suffix, NULL);
-		if (!gtkut_font_can_load(str)) {
-			debug_print("font '%s' load failed\n", str);
-			g_free(str);
-			str = NULL;
-		}
-#else /* __APPLE__ */
-		debug_print("font '%s' load failed\n", str);
 		g_free(str);
 		str = NULL;
-#endif
 	}
+#endif
 
 	if (str) {
 		debug_print("font '%s' load ok\n", str);
@@ -814,6 +813,20 @@ static void app_init(void)
 static void parse_gtkrc_files(void)
 {
 	gchar *userrc;
+
+#ifdef G_OS_WIN32
+	/* Set modern smooth ClearType font by default on Windows */
+	if (gtkut_font_can_load("Yu Gothic UI 9")) {
+		gtk_rc_parse_string("style \"syl-win32-default\" { font_name = \"Yu Gothic UI 9\" }\n"
+				    "class \"*\" style \"syl-win32-default\"\n");
+	} else if (gtkut_font_can_load("Meiryo UI 9")) {
+		gtk_rc_parse_string("style \"syl-win32-default\" { font_name = \"Meiryo UI 9\" }\n"
+				    "class \"*\" style \"syl-win32-default\"\n");
+	} else if (gtkut_font_can_load("Segoe UI 9")) {
+		gtk_rc_parse_string("style \"syl-win32-default\" { font_name = \"Segoe UI 9\" }\n"
+				    "class \"*\" style \"syl-win32-default\"\n");
+	}
+#endif
 
 	/* parse gtkrc files */
 	userrc = g_strconcat(get_home_dir(), G_DIR_SEPARATOR_S, ".gtkrc-2.0",
