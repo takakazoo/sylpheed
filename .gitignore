@@ -1,0 +1,73 @@
+# ==========================================
+# Sylpheed .gitignore
+# ==========================================
+
+# Object and library build artifacts
+*.o
+*.lo
+*.la
+*.res
+.deps/
+.libs/
+
+# Autotools generated files
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.h
+config.h.in
+config.log
+config.status
+configure
+depcomp
+install-sh
+libtool
+stamp-*
+ylwrap
+sylpheed.spec
+
+# Generated C source and header files
+src/quote_fmt_lex.c
+src/quote_fmt_parse.c
+src/quote_fmt_parse.h
+src/sylpheed-marshal.c
+src/sylpheed-marshal.h
+src/plugin-marshal.c
+src/plugin-marshal.h
+src/version.h
+src/sylpheed.rc
+src/icons/*.h
+
+# Translation generated files
+po/*.gmo
+po/POTFILES
+po/Makefile
+po/Makefile.in
+share/
+
+# Executables and libraries
+*.exe
+*.dll
+src/sylpheed.exe
+src/syl-auth-helper.exe
+
+# NSIS packaging and installers
+nsis/Sylpheed/
+nsis/plugins/
+nsis/*_setup.exe
+nsis/plugin-updater.exe
+nsis/update-manager.exe
+
+# Logs and temporary files
+*.log
+*.bak
+*.tmp
+*~
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
