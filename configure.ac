@@ -92,6 +92,10 @@ case "$target" in
 	;;
 esac
 
+if test "x$GCC" = "xyes"; then
+	CFLAGS="$CFLAGS -Wno-incompatible-pointer-types -Wno-implicit-function-declaration"
+fi
+
 AC_SUBST(LIBSYLPH_CFLAGS)
 AC_SUBST(LIBSYLPH_LIBS)
 

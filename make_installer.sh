@@ -9,7 +9,7 @@ echo "=========================================="
 echo " 1. Building Sylpheed"
 echo "=========================================="
 cd "$TOP_DIR"
-make CFLAGS='-O2 -g -Wno-incompatible-pointer-types -Wno-implicit-function-declaration' -j$(nproc 2>/dev/null || echo 4)
+make -j$(nproc 2>/dev/null || echo 4)
 
 echo "=========================================="
 echo " 2. Preparing packaging directories"

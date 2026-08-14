@@ -38,7 +38,7 @@ MSYS2 MINGW64 ターミナルでリポジトリディレクトリに移動し、
 ./autogen.sh
 
 # コンパイル
-make CFLAGS='-O2 -g -Wno-incompatible-pointer-types -Wno-implicit-function-declaration' -j$(nproc)
+make -j$(nproc)
 ```
 
 ---

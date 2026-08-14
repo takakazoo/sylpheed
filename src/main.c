@@ -98,6 +98,7 @@
 
 #ifdef G_OS_WIN32
 #  include <windows.h>
+#  include <gdk/gdkwin32.h>
 #  include <pbt.h>
 #  include <fcntl.h>
 #  include <conio.h>
