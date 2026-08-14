@@ -408,12 +408,12 @@ static void init_console(void)
 		return;
 	}
 
-	fd = _open_osfhandle((glong)GetStdHandle(STD_OUTPUT_HANDLE), _O_TEXT);
+	fd = _open_osfhandle((intptr_t)GetStdHandle(STD_OUTPUT_HANDLE), _O_TEXT);
 	_dup2(fd, 1);
 	fp = _fdopen(fd, "w");
 	*stdout = *fp;
 	setvbuf(stdout, NULL, _IONBF, 0);
-	fd = _open_osfhandle((glong)GetStdHandle(STD_ERROR_HANDLE), _O_TEXT);
+	fd = _open_osfhandle((intptr_t)GetStdHandle(STD_ERROR_HANDLE), _O_TEXT);
 	_dup2(fd, 2);
 	fp = _fdopen(fd, "w");
 	*stderr = *fp;
@@ -1717,7 +1717,7 @@ static gboolean lock_socket_input_cb(GIOChannel *source, GIOCondition condition,
 #ifdef G_OS_WIN32
 		HWND hwnd;
 
-		hwnd = (HWND)gdk_win32_drawable_get_handle
+		hwnd = (HWND)(uintptr_t)gdk_win32_drawable_get_handle
 			(GDK_DRAWABLE(mainwin->window->window));
 		fd_write(sock, (gchar *)&hwnd, sizeof(hwnd));
 		if (mainwin->window_hidden)

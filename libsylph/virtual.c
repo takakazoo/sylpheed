@@ -182,7 +182,7 @@ guint sinfo_hash(gconstpointer key)
 	const SearchCacheInfo *sinfo = key;
 	guint h;
 
-	h = (guint)sinfo->folder;
+	h = GPOINTER_TO_UINT(sinfo->folder);
 	h ^= sinfo->msgnum;
 	h ^= (guint)sinfo->size;
 	h ^= (guint)sinfo->mtime;
@@ -378,8 +378,8 @@ static GSList *virtual_search_folder(VirtualSearchInfo *info, FolderItem *item)
 			sinfo.mtime = msginfo->mtime;
 			sinfo.flags = msginfo->flags;
 
-			matched = (gint)g_hash_table_lookup
-				(info->search_cache_table, &sinfo);
+			matched = GPOINTER_TO_INT(g_hash_table_lookup
+				(info->search_cache_table, &sinfo));
 			if (matched == SCACHE_MATCHED) {
 				match_list = g_slist_prepend
 					(match_list, msginfo);

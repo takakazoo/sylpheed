@@ -276,7 +276,7 @@ gboolean account_address_exist(const gchar *address)
 		}
 	}
 
-	return (gboolean)g_hash_table_lookup(address_table, address);
+	return g_hash_table_lookup(address_table, address) != NULL;
 }
 
 void account_foreach(AccountFunc func, gpointer user_data)

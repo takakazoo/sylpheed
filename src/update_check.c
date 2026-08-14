@@ -160,8 +160,8 @@ static gboolean spawn_command(const gchar *exe, const gchar *args)
 	g_free(wargs);
 	g_free(wpath);
 
-	if ((gint)h <= 32) {
-		g_warning("Couldn't execute %s %s: (%d)", exe, args, (gint)h);
+	if ((intptr_t)h <= 32) {
+		g_warning("Couldn't execute %s %s: (%ld)", exe, args, (long)(intptr_t)h);
 		return FALSE;
 	}
 

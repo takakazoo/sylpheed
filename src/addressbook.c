@@ -2049,7 +2049,7 @@ static void addressbook_folder_resized(GtkWidget *widget,
 static void addressbook_col_resized(GtkWidget *widget,
 				    GtkAllocation *allocation, gpointer data)
 {
-	AddressBookListColumnPos type = (gint)data;
+	AddressBookListColumnPos type = GPOINTER_TO_INT(data);
 	gint width = allocation->width;
 
 	if (width < 8)
