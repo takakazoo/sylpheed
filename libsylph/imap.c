@@ -1373,7 +1373,7 @@ static gint imap_add_msgs(Folder *folder, FolderItem *dest, GSList *file_list,
 	gint count = 1;
 	gint total;
 	gint ok;
-	GTimeVal tv_prev, tv_cur;
+	gint64 tv_prev, tv_cur;
 
 	g_return_val_if_fail(folder != NULL, -1);
 	g_return_val_if_fail(dest != NULL, -1);
@@ -1382,7 +1382,7 @@ static gint imap_add_msgs(Folder *folder, FolderItem *dest, GSList *file_list,
 	session = imap_session_get(folder);
 	if (!session) return -1;
 
-	g_get_current_time(&tv_prev);
+	tv_prev = g_get_monotonic_time();
 	ui_update();
 
 	ok = imap_status(session, IMAP_FOLDER(folder), dest->path,
@@ -1421,10 +1421,8 @@ static gint imap_add_msgs(Folder *folder, FolderItem *dest, GSList *file_list,
 		    dest->stype == F_DRAFT)
 			iflags |= IMAP_FLAG_SEEN;
 
-		g_get_current_time(&tv_cur);
-		if (tv_cur.tv_sec > tv_prev.tv_sec ||
-		    tv_cur.tv_usec - tv_prev.tv_usec >
-		    PROGRESS_UPDATE_INTERVAL * 1000) {
+		tv_cur = g_get_monotonic_time();
+		if (tv_cur - tv_prev > PROGRESS_UPDATE_INTERVAL * 1000) {
 			status_print(_("Appending messages to %s (%d / %d)"),
 				     dest->path, count, total);
 			progress_show(count, total);
@@ -2743,13 +2741,13 @@ static gint imap_get_uncached_messages_func(IMAPSession *session, gpointer data)
 	GString *str;
 	MsgInfo *msginfo;
 	gint count = 1;
-	GTimeVal tv_prev, tv_cur;
+	gint64 tv_prev, tv_cur;
 	IMAPGetData *get_data = (IMAPGetData *)data;
 	FolderItem *item = get_data->item;
 	gint exists = get_data->exists;
 	gboolean update_count = get_data->update_count;
 
-	g_get_current_time(&tv_prev);
+	tv_prev = g_get_monotonic_time();
 #ifndef USE_THREADS
 	ui_update();
 #endif
@@ -2762,10 +2760,8 @@ static gint imap_get_uncached_messages_func(IMAPSession *session, gpointer data)
 
 	for (;;) {
 		if (exists > 0 && count <= exists) {
-			g_get_current_time(&tv_cur);
-			if (tv_cur.tv_sec > tv_prev.tv_sec ||
-			    tv_cur.tv_usec - tv_prev.tv_usec >
-			    PROGRESS_UPDATE_INTERVAL * 1000) {
+			tv_cur = g_get_monotonic_time();
+			if (tv_cur - tv_prev > PROGRESS_UPDATE_INTERVAL * 1000) {
 #if USE_THREADS
 				((IMAPRealSession *)session)->prog_count = count;
 				g_main_context_wakeup(NULL);

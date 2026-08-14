@@ -60,8 +60,8 @@ struct _IncProgressDialog
 
 	gboolean show_dialog;
 
-	GTimeVal progress_tv;
-	GTimeVal folder_tv;
+	gint64 progress_time;
+	gint64 folder_time;
 
 	GList *queue_list;	/* list of IncSession */
 	gint cur_row;

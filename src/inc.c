@@ -721,8 +721,8 @@ static IncProgressDialog *inc_progress_dialog_create(gboolean autocheck)
 	}
 
 	dialog->dialog = progress;
-	g_get_current_time(&dialog->progress_tv);
-	g_get_current_time(&dialog->folder_tv);
+	dialog->progress_time = g_get_monotonic_time();
+	dialog->folder_time = g_get_monotonic_time();
 	dialog->queue_list = NULL;
 	dialog->cur_row = 0;
 
@@ -1301,48 +1301,22 @@ static void inc_update_folderview(IncProgressDialog *inc_dialog,
 static void inc_progress_dialog_update_periodic(IncProgressDialog *inc_dialog,
 						IncSession *inc_session)
 {
-	GTimeVal tv_cur;
-	GTimeVal tv_result;
-	gint msec;
+	gint64 time_cur = g_get_monotonic_time();
 
-	g_get_current_time(&tv_cur);
-
-	tv_result.tv_sec = tv_cur.tv_sec - inc_dialog->progress_tv.tv_sec;
-	tv_result.tv_usec = tv_cur.tv_usec - inc_dialog->progress_tv.tv_usec;
-	if (tv_result.tv_usec < 0) {
-		tv_result.tv_sec--;
-		tv_result.tv_usec += G_USEC_PER_SEC;
-	}
-
-	msec = tv_result.tv_sec * 1000 + tv_result.tv_usec / 1000;
-	if (msec > PROGRESS_UPDATE_INTERVAL) {
+	if (time_cur - inc_dialog->progress_time > PROGRESS_UPDATE_INTERVAL * 1000) {
 		inc_progress_dialog_update(inc_dialog, inc_session);
-		inc_dialog->progress_tv.tv_sec = tv_cur.tv_sec;
-		inc_dialog->progress_tv.tv_usec = tv_cur.tv_usec;
+		inc_dialog->progress_time = time_cur;
 	}
 }
 
 static void inc_update_folderview_periodic(IncProgressDialog *inc_dialog,
 					   IncSession *inc_session)
 {
-	GTimeVal tv_cur;
-	GTimeVal tv_result;
-	gint msec;
+	gint64 time_cur = g_get_monotonic_time();
 
-	g_get_current_time(&tv_cur);
-
-	tv_result.tv_sec = tv_cur.tv_sec - inc_dialog->folder_tv.tv_sec;
-	tv_result.tv_usec = tv_cur.tv_usec - inc_dialog->folder_tv.tv_usec;
-	if (tv_result.tv_usec < 0) {
-		tv_result.tv_sec--;
-		tv_result.tv_usec += G_USEC_PER_SEC;
-	}
-
-	msec = tv_result.tv_sec * 1000 + tv_result.tv_usec / 1000;
-	if (msec > FOLDER_UPDATE_INTERVAL) {
+	if (time_cur - inc_dialog->folder_time > FOLDER_UPDATE_INTERVAL * 1000) {
 		inc_update_folderview(inc_dialog, inc_session);
-		inc_dialog->folder_tv.tv_sec = tv_cur.tv_sec;
-		inc_dialog->folder_tv.tv_usec = tv_cur.tv_usec;
+		inc_dialog->folder_time = time_cur;
 	}
 }
 

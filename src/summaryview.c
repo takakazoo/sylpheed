@@ -670,21 +670,19 @@ static void get_msg_list_func(Folder *folder, FolderItem *item, gpointer data)
 {
 	SummaryView *summary = (SummaryView *)folder->data;
 	gint count = GPOINTER_TO_INT(data);
-	static GTimeVal tv_prev = {0, 0};
-	GTimeVal tv_cur;
+	static gint64 time_prev = 0;
+	gint64 time_cur;
 
-	g_get_current_time(&tv_cur);
+	time_cur = g_get_monotonic_time();
 
-	if (tv_prev.tv_sec == 0 ||
-	    (tv_cur.tv_sec - tv_prev.tv_sec) * G_USEC_PER_SEC +
-	    tv_cur.tv_usec - tv_prev.tv_usec > 100 * 1000) {
+	if (time_prev == 0 || time_cur - time_prev > 100 * 1000) {
 		gchar buf[256];
 
 		g_snprintf(buf, sizeof(buf), _("Scanning folder (%s) (%d)..."),
 			   item->path, count);
 		STATUSBAR_POP(summary->mainwin);
 		STATUSBAR_PUSH(summary->mainwin, buf);
-		tv_prev = tv_cur;
+		time_prev = time_cur;
 	}
 }
 

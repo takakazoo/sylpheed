@@ -684,7 +684,7 @@ typedef struct _QueryData
 	gint count;
 	gint total;
 	gint flag;
-	GTimeVal tv_prev;
+	gint64 time_prev;
 	GSList *mlist;
 #if USE_THREADS
 	GAsyncQueue *queue;
@@ -729,7 +729,7 @@ static gpointer query_search_folder_func(gpointer data)
 	QueryData *qdata = (QueryData *)data;
 	GSList *mlist, *cur;
 	FilterInfo fltinfo;
-	GTimeVal tv_cur;
+	gint64 time_cur;
 
 	debug_print("query_search_folder_func start\n");
 
@@ -743,8 +743,6 @@ static gpointer query_search_folder_func(gpointer data)
 
 	debug_print("requires_full_headers: %d\n",
 		    search_window.requires_full_headers);
-	debug_print("start query search: %s\n",
-		    qdata->item->path ? qdata->item->path : "");
 
 	for (cur = mlist; cur != NULL; cur = cur->next) {
 		MsgInfo *msginfo = (MsgInfo *)cur->data;
@@ -752,16 +750,14 @@ static gpointer query_search_folder_func(gpointer data)
 
 		g_atomic_int_add(&qdata->count, 1);
 
-		g_get_current_time(&tv_cur);
-		if ((tv_cur.tv_sec - qdata->tv_prev.tv_sec) * G_USEC_PER_SEC +
-		    tv_cur.tv_usec - qdata->tv_prev.tv_usec >
-		    PROGRESS_UPDATE_INTERVAL * 1000) {
+		time_cur = g_get_monotonic_time();
+		if (time_cur - qdata->time_prev > PROGRESS_UPDATE_INTERVAL * 1000) {
 #ifndef USE_THREADS
 			query_search_folder_show_progress(qdata->folder_name,
 							  qdata->count,
 							  qdata->total);
 #endif
-			qdata->tv_prev = tv_cur;
+			qdata->time_prev = time_cur;
 		}
 
 		if (search_window.cancelled)
@@ -822,7 +818,7 @@ static void query_search_folder(FolderItem *item)
 	str = g_strdup_printf(_("Searching %s ..."), data.folder_name);
 	gtk_label_set_text(GTK_LABEL(search_window.status_label), str);
 	g_free(str);
-	g_get_current_time(&data.tv_prev);
+	data.time_prev = g_get_monotonic_time();
 #ifndef USE_THREADS
 	ui_update();
 #endif

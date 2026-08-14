@@ -118,7 +118,7 @@ struct _Session
 	SessionState state;
 
 	stime_t last_access_time;
-	GTimeVal tv_prev;
+	gint64 time_prev;
 
 	gint conn_id;
 

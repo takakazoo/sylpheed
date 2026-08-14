@@ -331,7 +331,7 @@ static GSList *virtual_search_folder(VirtualSearchInfo *info, FolderItem *item)
 	GSList *cur;
 	FilterInfo fltinfo;
 	gint count = 1, total, ncachehit = 0;
-	GTimeVal tv_prev, tv_cur;
+	gint64 tv_prev, tv_cur;
 
 	g_return_val_if_fail(info != NULL, NULL);
 	g_return_val_if_fail(info->rule != NULL, NULL);
@@ -342,7 +342,7 @@ static GSList *virtual_search_folder(VirtualSearchInfo *info, FolderItem *item)
 	if (item->stype == F_VIRTUAL)
 		return NULL;
 
-	g_get_current_time(&tv_prev);
+	tv_prev = g_get_monotonic_time();
 	status_print(_("Searching %s ..."), item->path);
 
 	mlist = folder_item_get_msg_list(item, TRUE);
@@ -358,10 +358,8 @@ static GSList *virtual_search_folder(VirtualSearchInfo *info, FolderItem *item)
 		MsgInfo *msginfo = (MsgInfo *)cur->data;
 		GSList *hlist;
 
-		g_get_current_time(&tv_cur);
-		if (tv_cur.tv_sec > tv_prev.tv_sec ||
-		    tv_cur.tv_usec - tv_prev.tv_usec >
-		    PROGRESS_UPDATE_INTERVAL * 1000) {
+		tv_cur = g_get_monotonic_time();
+		if (tv_cur - tv_prev > PROGRESS_UPDATE_INTERVAL * 1000) {
 			status_print(_("Searching %s (%d / %d)..."),
 				     item->path, count, total);
 			tv_prev = tv_cur;
