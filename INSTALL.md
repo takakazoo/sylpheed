@@ -114,3 +114,10 @@ sudo make install
 | `--enable-oniguruma` | 鬼雲 (Oniguruma) 正規表現ライブラリを有効化 (既定: 有効) |
 | `--enable-threads` | マルチスレッド処理を有効化 (既定: 有効) |
 | `--prefix=DIR` | インストール先ディレクトリの指定 (既定: `/usr/local` または `/mingw64`) |
+
+---
+
+## 4. OAuth 2.0 認証 (Gmail / Microsoft 365 / Outlook.com)
+
+Gmail や Microsoft 365 / Outlook.com で OAuth 2.0 認証を利用する手順については、**[OAUTH2.md](OAUTH2.md)** をご覧ください。
+`oauth2.ini.sample` を参考に `oauth2.ini` を作成・配置することで、安全な OAuth 2.0 認証（XOAUTH2）が有効になります。

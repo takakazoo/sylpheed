@@ -58,6 +58,8 @@ cp README "$DIST_DIR/README.txt" 2>/dev/null || true
 cp README.ja "$DIST_DIR/README-win32-ja.txt" 2>/dev/null || true
 cp README.es "$DIST_DIR/README-win32-es.txt" 2>/dev/null || true
 cp README "$DIST_DIR/README-win32.txt" 2>/dev/null || true
+cp oauth2.ini.sample "$DIST_DIR/oauth2.ini.sample" 2>/dev/null || true
+cp OAUTH2.md "$DIST_DIR/OAUTH2.txt" 2>/dev/null || true
 
 # Icons
 if [ -d src/icons ]; then
