@@ -582,7 +582,7 @@ static void setup_account_response_cb(GtkDialog *dialog, gint response_id,
 			break;
 		case SETUP_TYPE_POP3M:
 			if (prev_page == SETUP_PAGE_START)
-				gtk_entry_set_text(GTK_ENTRY(setupac.addr_entry), "(username)@***.onmicrosoft.com");
+				gtk_entry_set_text(GTK_ENTRY(setupac.addr_entry), "(username)@outlook.com");
 			gtk_widget_set_sensitive(setupac.id_entry, FALSE);
 			gtk_label_set_text(GTK_LABEL(setupac.serv_label_name1), _("POP3 server:"));
 			gtk_entry_set_text(GTK_ENTRY(setupac.serv_entry), MS365_POP3_SERVER);
@@ -592,7 +592,7 @@ static void setup_account_response_cb(GtkDialog *dialog, gint response_id,
 			break;
 		case SETUP_TYPE_IMAPM:
 			if (prev_page == SETUP_PAGE_START)
-				gtk_entry_set_text(GTK_ENTRY(setupac.addr_entry), "(username)@***.onmicrosoft.com");
+				gtk_entry_set_text(GTK_ENTRY(setupac.addr_entry), "(username)@outlook.com");
 			gtk_widget_set_sensitive(setupac.id_entry, FALSE);
 			gtk_label_set_text(GTK_LABEL(setupac.serv_label_name1), _("IMAP4 server:"));
 			gtk_entry_set_text(GTK_ENTRY(setupac.serv_entry), MS365_IMAP_SERVER);
@@ -827,10 +827,10 @@ PrefsAccount *setup_account(void)
 	gtk_box_pack_start(GTK_BOX(vbox), setupac.imapg_radio, FALSE, FALSE, 0);
 
 	setupac.pop3m_radio = gtk_radio_button_new_with_label_from_widget
-		(GTK_RADIO_BUTTON(setupac.pop3_radio), "POP3 (MS365)");
+		(GTK_RADIO_BUTTON(setupac.pop3_radio), "POP3 (Microsoft 365 / Outlook.com)");
 	gtk_box_pack_start(GTK_BOX(vbox), setupac.pop3m_radio, FALSE, FALSE, 0);
 	setupac.imapm_radio = gtk_radio_button_new_with_label_from_widget
-		(GTK_RADIO_BUTTON(setupac.pop3_radio), "IMAP4 (MS365)");
+		(GTK_RADIO_BUTTON(setupac.pop3_radio), "IMAP4 (Microsoft 365 / Outlook.com)");
 	gtk_box_pack_start(GTK_BOX(vbox), setupac.imapm_radio, FALSE, FALSE, 0);
 #endif
 
