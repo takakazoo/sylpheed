@@ -34,19 +34,69 @@
 #include "utils.h"
 
 
+static gchar *find_auth_helper_path(void)
+{
+	gchar *path = NULL;
+
+#ifdef G_OS_WIN32
+	/* 1. Check in startup dir (installation dir) */
+	path = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S, "syl-auth-helper.exe", NULL);
+	if (is_file_exist(path))
+		return path;
+	g_free(path);
+
+	/* 2. Check development dir */
+	path = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S, "src", G_DIR_SEPARATOR_S, ".libs", G_DIR_SEPARATOR_S, "syl-auth-helper.exe", NULL);
+	if (is_file_exist(path))
+		return path;
+	g_free(path);
+
+	path = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S, "src", G_DIR_SEPARATOR_S, "syl-auth-helper.exe", NULL);
+	if (is_file_exist(path))
+		return path;
+	g_free(path);
+
+	/* 3. Check in PATH */
+	path = g_find_program_in_path("syl-auth-helper.exe");
+	if (path)
+		return path;
+	path = g_find_program_in_path("syl-auth-helper");
+	if (path)
+		return path;
+#else
+	path = g_strconcat(get_startup_dir(), G_DIR_SEPARATOR_S, "syl-auth-helper", NULL);
+	if (is_file_exist(path))
+		return path;
+	g_free(path);
+
+	path = g_find_program_in_path("syl-auth-helper");
+	if (path)
+		return path;
+#endif
+
+	return g_strdup("syl-auth-helper");
+}
+
 gint oauth2_get_token   (const gchar     *user,
                          gchar          **token,
                          gchar          **r_token,
                          gint            *expire)
 {
-	gchar *argv[] = {"syl-auth-helper", NULL, NULL};
+	gchar *helper_path = NULL;
+	gchar *argv[3];
 	gchar *out = NULL;
 	gint status = 0;
 	GError *error = NULL;
 
 	g_return_val_if_fail(user != NULL, -1);
 
+	helper_path = find_auth_helper_path();
+	argv[0] = helper_path;
 	argv[1] = (gchar *)user;
+	argv[2] = NULL;
+
+	debug_print("Executing OAuth2 helper: %s %s\n", helper_path, user);
+
 	if (g_spawn_sync(NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
 			 NULL, NULL, &out, NULL, &status, &error)) {
 		debug_print("syl-auth-helper out: %s\n", out);
@@ -57,10 +107,15 @@ gint oauth2_get_token   (const gchar     *user,
 				*r_token = g_strdup(g_strchomp(lines[1]));
 		}
 		g_strfreev(lines);
+		g_free(out);
+		g_free(helper_path);
 		return 0;
 	} else {
-		g_warning("OAuth2 helper execution failed.\n");
-		g_error_free(error);
+		g_warning("OAuth2 helper execution failed (%s): %s\n",
+			  helper_path, error ? error->message : "unknown error");
+		if (error)
+			g_error_free(error);
+		g_free(helper_path);
 		return -1;
 	}
 }
