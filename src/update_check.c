@@ -44,6 +44,7 @@
 #include "utils.h"
 #include "version.h"
 #include "plugin.h"
+#include "main.h"
 
 #ifdef G_OS_WIN32
 #  include <windows.h>

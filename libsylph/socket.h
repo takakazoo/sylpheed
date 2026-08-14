@@ -144,6 +144,7 @@ gint fd_open_unix	(const gchar *path);
 gint fd_accept		(gint sock);
 
 gint fd_read		(gint sock, gchar *buf, gint len);
+gint fd_recv		(gint sock, gchar *buf, gint len, gint flags);
 gint fd_write		(gint sock, const gchar *buf, gint len);
 gint fd_write_all	(gint sock, const gchar *buf, gint len);
 gint fd_gets		(gint sock, gchar *buf, gint len);

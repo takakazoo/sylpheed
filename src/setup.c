@@ -43,6 +43,7 @@
 #include "stock_pixmap.h"
 #include "account.h"
 #include "addressbook.h"
+#include "import.h"
 #if USE_SSL
 #  include "ssl.h"
 #endif
