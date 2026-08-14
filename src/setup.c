@@ -1072,14 +1072,15 @@ PrefsAccount *setup_account(void)
 		ac->protocol = A_POP3;
 		ac->ssl_pop = SSL_TUNNEL;
 		ac->popport = setupac.serv_port;
-		ac->smtp_auth_type = SMTPAUTH_PLAIN;
+		ac->pop_auth_type = POP3_AUTH_OAUTH2;
+		ac->smtp_auth_type = SMTPAUTH_OAUTH2;
 		break;
 	case SETUP_TYPE_IMAPG:
 		ac->protocol = A_IMAP4;
 		ac->ssl_imap = SSL_TUNNEL;
 		ac->imapport = setupac.serv_port;
-		ac->imap_auth_type = IMAP_AUTH_PLAIN;
-		ac->smtp_auth_type = SMTPAUTH_PLAIN;
+		ac->imap_auth_type = IMAP_AUTH_OAUTH2;
+		ac->smtp_auth_type = SMTPAUTH_OAUTH2;
 		break;
 	case SETUP_TYPE_POP3M:
 		ac->protocol = A_POP3;
