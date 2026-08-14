@@ -28,10 +28,18 @@
 
 #ifdef G_OS_WIN32
 #  define COBJMACROS
+#  define Folder win32_Folder
+#  define FolderItem win32_FolderItem
+#  define SORT_ASCENDING win32_SORT_ASCENDING
+#  define SORT_DESCENDING win32_SORT_DESCENDING
 #  include <windows.h>
 #  include <objbase.h>
 #  include <objidl.h>
 #  include <shlobj.h>
+#  undef Folder
+#  undef FolderItem
+#  undef SORT_ASCENDING
+#  undef SORT_DESCENDING
 #endif
 
 #include "main.h"

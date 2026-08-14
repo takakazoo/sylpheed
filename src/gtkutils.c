@@ -100,26 +100,7 @@ void gtkut_widget_set_small_font_size(GtkWidget *widget)
 
 gboolean gtkut_font_can_load(const gchar *str)
 {
-#ifdef G_OS_WIN32
-	PangoFontDescription *desc;
-	PangoContext *context;
-	PangoFont *font;
-	gboolean can_load = FALSE;
-
-	desc = pango_font_description_from_string(str);
-	if (desc) {
-		context = pango_win32_get_context();
-		font = pango_context_load_font(context, desc);
-		if (font) {
-			can_load = TRUE;
-			g_object_unref(font);
-		}
-		g_object_unref(context);
-		pango_font_description_free(desc);
-	}
-
-	return can_load;
-#elif defined(__APPLE__)
+#if defined(G_OS_WIN32) || defined(__APPLE__)
 	PangoFontDescription *desc;
 	PangoContext *context;
 	PangoFont *font;
