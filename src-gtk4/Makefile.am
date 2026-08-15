@@ -4,6 +4,12 @@ sylpheed_gtk4_SOURCES = \
 	main.c \
 	mainwindow.c \
 	mainwindow.h \
+	folderview.c \
+	folderview.h \
+	summaryview.c \
+	summaryview.h \
+	messageview.c \
+	messageview.h \
 	menu.c \
 	menu.h \
 	about.c \

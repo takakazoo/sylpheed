@@ -6,6 +6,9 @@
 #define __MAINWINDOW_GTK4_H__
 
 #include <gtk/gtk.h>
+#include "folderview.h"
+#include "summaryview.h"
+#include "messageview.h"
 
 typedef struct _MainWindow MainWindow;
 
@@ -16,10 +19,10 @@ struct _MainWindow
 	GtkWidget *paned_main;
 	GtkWidget *paned_sub;
 
-	/* 3 Panes */
-	GtkWidget *folder_view_box;
-	GtkWidget *summary_view_box;
-	GtkWidget *message_view_box;
+	/* 3 Panes Components */
+	FolderView *folderview;
+	SummaryView *summaryview;
+	MessageView *messageview;
 
 	GtkWidget *status_bar;
 	GtkWidget *status_label;

@@ -6,6 +6,22 @@
 #include "menu.h"
 #include <glib/gi18n.h>
 
+static void on_message_selected(SummaryView *summaryview, const char *msg_body, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	if (mainwin && mainwin->messageview) {
+		message_view_set_text(mainwin->messageview, msg_body);
+	}
+}
+
+static void on_folder_selected(FolderView *folderview, FolderItem *item, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	if (mainwin && mainwin->summaryview) {
+		summary_view_load_folder(mainwin->summaryview, item);
+	}
+}
+
 MainWindow *main_window_create(GtkApplication *app)
 {
 	MainWindow *mainwin;
@@ -14,8 +30,6 @@ MainWindow *main_window_create(GtkApplication *app)
 	GtkWidget *btn_get, *btn_compose, *btn_reply, *btn_forward, *btn_delete;
 	GtkWidget *btn_menu;
 	GtkWidget *paned_h, *paned_v;
-	GtkWidget *folder_frame, *summary_frame, *message_frame;
-	GtkWidget *label;
 	GtkWidget *vbox;
 	GtkWidget *menubar;
 	GMenuModel *app_menu_model;
@@ -29,7 +43,7 @@ MainWindow *main_window_create(GtkApplication *app)
 	/* Main Window */
 	win = gtk_application_window_new(app);
 	gtk_window_set_title(GTK_WINDOW(win), "Sylpheed (GTK4 Preview)");
-	gtk_window_set_default_size(GTK_WINDOW(win), 1080, 720);
+	gtk_window_set_default_size(GTK_WINDOW(win), 1120, 740);
 	mainwin->window = GTK_APPLICATION_WINDOW(win);
 
 	/* Header Bar (Modern Titlebar with Tools) */
@@ -80,7 +94,7 @@ MainWindow *main_window_create(GtkApplication *app)
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	gtk_window_set_child(GTK_WINDOW(win), vbox);
 
-	/* Optional Top Menu Bar (for traditional desktop feel) */
+	/* Optional Top Menu Bar */
 	main_menu_model = menu_create_main_menu();
 	menubar = gtk_popover_menu_bar_new_from_model(main_menu_model);
 	gtk_box_append(GTK_BOX(vbox), menubar);
@@ -93,32 +107,25 @@ MainWindow *main_window_create(GtkApplication *app)
 	gtk_box_append(GTK_BOX(vbox), paned_h);
 	mainwin->paned_main = paned_h;
 
-	/* Left Pane: Folder Tree */
-	folder_frame = gtk_frame_new(_("フォルダ"));
-	label = gtk_label_new("📁 メールボックス / フォルダツリー\n(Phase 3 でデータ連携予定)");
-	gtk_frame_set_child(GTK_FRAME(folder_frame), label);
-	gtk_paned_set_start_child(GTK_PANED(paned_h), folder_frame);
-	mainwin->folder_view_box = folder_frame;
+	/* 1. Left Pane: Folder View */
+	mainwin->folderview = folder_view_create();
+	folder_view_set_selected_callback(mainwin->folderview, on_folder_selected, mainwin);
+	gtk_paned_set_start_child(GTK_PANED(paned_h), mainwin->folderview->container);
 
 	/* Right Vertical Paned */
 	paned_v = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
-	gtk_paned_set_position(GTK_PANED(paned_v), 300);
+	gtk_paned_set_position(GTK_PANED(paned_v), 320);
 	gtk_paned_set_end_child(GTK_PANED(paned_h), paned_v);
 	mainwin->paned_sub = paned_v;
 
-	/* Top Right Pane: Summary View */
-	summary_frame = gtk_frame_new(_("メール一覧"));
-	label = gtk_label_new("✉️ 件名 / 送信者 / 日時 カラム一覧\n(Phase 3 で GtkColumnView 連携予定)");
-	gtk_frame_set_child(GTK_FRAME(summary_frame), label);
-	gtk_paned_set_start_child(GTK_PANED(paned_v), summary_frame);
-	mainwin->summary_view_box = summary_frame;
+	/* 2. Top Right Pane: Summary View (Mail List) */
+	mainwin->summaryview = summary_view_create();
+	summary_view_set_selected_callback(mainwin->summaryview, on_message_selected, mainwin);
+	gtk_paned_set_start_child(GTK_PANED(paned_v), mainwin->summaryview->container);
 
-	/* Bottom Right Pane: Message View */
-	message_frame = gtk_frame_new(_("メッセージプレビュー"));
-	label = gtk_label_new("📄 メッセージ本文 / ヘッダ表示\n(Phase 4 で GtkTextView 連携予定)");
-	gtk_frame_set_child(GTK_FRAME(message_frame), label);
-	gtk_paned_set_end_child(GTK_PANED(paned_v), message_frame);
-	mainwin->message_view_box = message_frame;
+	/* 3. Bottom Right Pane: Message View (Preview) */
+	mainwin->messageview = message_view_create();
+	gtk_paned_set_end_child(GTK_PANED(paned_v), mainwin->messageview->container);
 
 	/* Status Bar */
 	mainwin->status_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
@@ -127,7 +134,7 @@ MainWindow *main_window_create(GtkApplication *app)
 	gtk_widget_set_margin_top(mainwin->status_bar, 4);
 	gtk_widget_set_margin_bottom(mainwin->status_bar, 4);
 
-	mainwin->status_label = gtk_label_new(_("Sylpheed GTK4 準備完了 | ショートカット: 受信(Ctrl+I) 作成(Ctrl+N) 検索(Ctrl+F) 終了(Ctrl+Q)"));
+	mainwin->status_label = gtk_label_new(_("2 通のメッセージ (Sylpheed GTK4)"));
 	gtk_box_append(GTK_BOX(mainwin->status_bar), mainwin->status_label);
 	gtk_box_append(GTK_BOX(vbox), mainwin->status_bar);
 
