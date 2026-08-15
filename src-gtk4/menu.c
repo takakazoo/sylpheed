@@ -17,18 +17,20 @@
 #include "foldersel.h"
 #include "inputdialog.h"
 #include "alertpanel.h"
+#include "inc.h"
+#include "send_message.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] 受信 (Get mail)\n");
-	log_window_append("[POP3] Connecting to server to check for new mail...\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	inc_mail(mainwin ? GTK_WINDOW(mainwin->window) : NULL, NULL);
 }
 
 static void action_get_all_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] 全受信 (Get all mail)\n");
-	log_window_append("[POP3/IMAP] Checking all accounts for new mail...\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	inc_all_account_mail(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
 }
 
 static void action_compose(GSimpleAction *action, GVariant *parameter, gpointer user_data)

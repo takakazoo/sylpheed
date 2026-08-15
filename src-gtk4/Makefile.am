@@ -34,6 +34,14 @@ sylpheed_gtk4_SOURCES = \
 	sourcewindow.h \
 	foldersel.c \
 	foldersel.h \
+	progressdialog.c \
+	progressdialog.h \
+	inc.c \
+	inc.h \
+	send_message.c \
+	send_message.h \
+	sslmanager.c \
+	sslmanager.h \
 	menu.c \
 	menu.h \
 	about.c \

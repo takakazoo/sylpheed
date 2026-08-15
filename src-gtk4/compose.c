@@ -3,6 +3,7 @@
  */
 
 #include "compose.h"
+#include "send_message.h"
 #include <glib/gi18n.h>
 
 static void on_send_clicked(GtkButton *btn, gpointer user_data)
@@ -10,10 +11,17 @@ static void on_send_clicked(GtkButton *btn, gpointer user_data)
 	ComposeWindow *compose = (ComposeWindow *)user_data;
 	const char *to = gtk_editable_get_text(GTK_EDITABLE(compose->entry_to));
 	const char *subject = gtk_editable_get_text(GTK_EDITABLE(compose->entry_subject));
+	GtkTextIter start, end;
+	char *body = NULL;
 
-	g_print("[Compose] 送信実行: To=%s, Subject=%s\n", to, subject);
+	if (compose->text_buffer) {
+		gtk_text_buffer_get_bounds(compose->text_buffer, &start, &end);
+		body = gtk_text_buffer_get_text(compose->text_buffer, &start, &end, FALSE);
+	}
 
-	/* Close window on send */
+	send_message(GTK_WINDOW(compose->window), compose->account, to, subject, body, NULL);
+
+	g_free(body);
 	gtk_window_destroy(GTK_WINDOW(compose->window));
 }
 
@@ -28,7 +36,6 @@ static void on_attach_clicked(GtkButton *btn, gpointer user_data)
 	GtkFileDialog *dialog = gtk_file_dialog_new();
 	gtk_file_dialog_set_title(dialog, _("添付ファイルの選択"));
 
-	/* Phase 4 file dialog placeholder */
 	gtk_string_list_append(compose->attach_model, "📎 添付ファイル (sample.pdf, 120 KB)");
 	gtk_widget_set_visible(compose->attach_box, TRUE);
 }
