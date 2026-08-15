@@ -13,6 +13,10 @@
 #include "logwindow.h"
 #include "filter_dialog.h"
 #include "search_dialog.h"
+#include "sourcewindow.h"
+#include "foldersel.h"
+#include "inputdialog.h"
+#include "alertpanel.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -56,7 +60,38 @@ static void action_forward(GSimpleAction *action, GVariant *parameter, gpointer 
 
 static void action_delete(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] 削除 (Delete)\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	alertpanel_notice(mainwin ? GTK_WINDOW(mainwin->window) : NULL, _("削除"), _("選択したメッセージをごみ箱へ移動しました。"));
+}
+
+static void action_view_source(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	source_window_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL, NULL);
+}
+
+static void action_move_to(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	foldersel_folder_sel(mainwin ? GTK_WINDOW(mainwin->window) : NULL, _("メッセージの移動先"), "INBOX");
+}
+
+static void action_folder_new(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	input_dialog(mainwin ? GTK_WINDOW(mainwin->window) : NULL, _("新規フォルダの作成"), _("作成するフォルダの名前を入力してください:"), "New Folder");
+}
+
+static void action_folder_rename(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	input_dialog(mainwin ? GTK_WINDOW(mainwin->window) : NULL, _("フォルダ名の変更"), _("新しいフォルダ名を入力してください:"), "Renamed Folder");
+}
+
+static void action_folder_empty_trash(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	alertpanel_notice(mainwin ? GTK_WINDOW(mainwin->window) : NULL, _("ごみ箱を空にする"), _("ごみ箱内のメッセージをすべて消去しました。"));
 }
 
 static void action_search(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -120,6 +155,11 @@ static const GActionEntry app_entries[] = {
 	{ "reply", action_reply, NULL, NULL, NULL },
 	{ "forward", action_forward, NULL, NULL, NULL },
 	{ "delete", action_delete, NULL, NULL, NULL },
+	{ "view-source", action_view_source, NULL, NULL, NULL },
+	{ "move-to", action_move_to, NULL, NULL, NULL },
+	{ "folder-new", action_folder_new, NULL, NULL, NULL },
+	{ "folder-rename", action_folder_rename, NULL, NULL, NULL },
+	{ "folder-empty-trash", action_folder_empty_trash, NULL, NULL, NULL },
 	{ "search", action_search, NULL, NULL, NULL },
 	{ "filter", action_filter, NULL, NULL, NULL },
 	{ "preferences", action_preferences, NULL, NULL, NULL },
@@ -141,6 +181,7 @@ void menu_init_actions(GtkApplication *app, gpointer mainwin)
 	const char *accel_inc_all[] = { "<Primary><Shift>i", NULL };
 	const char *accel_compose[] = { "<Primary>n", NULL };
 	const char *accel_search[] = { "<Primary>f", NULL };
+	const char *accel_source[] = { "<Primary>u", NULL };
 	const char *accel_quit[] = { "<Primary>q", NULL };
 	const char *accel_delete[] = { "Delete", NULL };
 
@@ -148,6 +189,7 @@ void menu_init_actions(GtkApplication *app, gpointer mainwin)
 	gtk_application_set_accels_for_action(app, "app.inc-all", accel_inc_all);
 	gtk_application_set_accels_for_action(app, "app.compose", accel_compose);
 	gtk_application_set_accels_for_action(app, "app.search", accel_search);
+	gtk_application_set_accels_for_action(app, "app.view-source", accel_source);
 	gtk_application_set_accels_for_action(app, "app.quit", accel_quit);
 	gtk_application_set_accels_for_action(app, "app.delete", accel_delete);
 }
@@ -175,6 +217,8 @@ GMenuModel *menu_create_main_menu(void)
 	GMenu *msg_menu = g_menu_new();
 	g_menu_append(msg_menu, _("返信"), "app.reply");
 	g_menu_append(msg_menu, _("転送"), "app.forward");
+	g_menu_append(msg_menu, _("メッセージのソースを表示"), "app.view-source");
+	g_menu_append(msg_menu, _("フォルダへ移動..."), "app.move-to");
 	g_menu_append(msg_menu, _("削除"), "app.delete");
 	g_menu_append_submenu(menubar, _("メッセージ"), G_MENU_MODEL(msg_menu));
 

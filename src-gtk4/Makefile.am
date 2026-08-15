@@ -26,6 +26,14 @@ sylpheed_gtk4_SOURCES = \
 	search_dialog.h \
 	logwindow.c \
 	logwindow.h \
+	alertpanel.c \
+	alertpanel.h \
+	inputdialog.c \
+	inputdialog.h \
+	sourcewindow.c \
+	sourcewindow.h \
+	foldersel.c \
+	foldersel.h \
 	menu.c \
 	menu.h \
 	about.c \

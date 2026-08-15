@@ -141,6 +141,29 @@ static void on_summary_selection_changed(GtkSingleSelection *selection, GParamSp
 	}
 }
 
+static void on_summary_right_click(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data)
+{
+	SummaryView *summaryview = (SummaryView *)user_data;
+	GtkWidget *menu_popover;
+	GMenu *menu;
+
+	if (gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture)) == GDK_BUTTON_SECONDARY) {
+		menu = g_menu_new();
+		g_menu_append(menu, _("返信"), "app.reply");
+		g_menu_append(menu, _("転送"), "app.forward");
+		g_menu_append(menu, _("メッセージのソースを表示"), "app.view-source");
+		g_menu_append(menu, _("フォルダへ移動..."), "app.move-to");
+		g_menu_append(menu, _("削除"), "app.delete");
+		g_menu_append(menu, _("未読にする"), "app.mark-unread");
+		g_menu_append(menu, _("マークを付ける"), "app.mark");
+
+		menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
+		gtk_widget_set_parent(menu_popover, summaryview->column_view);
+		gtk_popover_set_pointing_to(GTK_POPOVER(menu_popover), &(const GdkRectangle){(int)x, (int)y, 1, 1});
+		gtk_popover_popup(GTK_POPOVER(menu_popover));
+	}
+}
+
 SummaryView *summary_view_create(void)
 {
 	SummaryView *summaryview;
@@ -149,6 +172,7 @@ SummaryView *summary_view_create(void)
 	GtkWidget *scrolled_win;
 	GtkListItemFactory *factory;
 	GtkColumnViewColumn *col;
+	GtkGesture *right_click_gesture;
 
 	summaryview = g_new0(SummaryView, 1);
 
@@ -271,6 +295,12 @@ SummaryView *summary_view_create(void)
 	gtk_column_view_append_column(GTK_COLUMN_VIEW(summaryview->column_view), col);
 
 	g_signal_connect(summaryview->selection, "notify::selected", G_CALLBACK(on_summary_selection_changed), summaryview);
+
+	/* Right-click Gesture for Context Menu */
+	right_click_gesture = gtk_gesture_click_new();
+	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(right_click_gesture), GDK_BUTTON_SECONDARY);
+	g_signal_connect(right_click_gesture, "pressed", G_CALLBACK(on_summary_right_click), summaryview);
+	gtk_widget_add_controller(summaryview->column_view, GTK_EVENT_CONTROLLER(right_click_gesture));
 
 	scrolled_win = gtk_scrolled_window_new();
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_win), summaryview->column_view);

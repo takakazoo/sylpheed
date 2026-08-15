@@ -4,6 +4,8 @@
 
 #include "folderview.h"
 #include "folder.h"
+#include "inputdialog.h"
+#include "alertpanel.h"
 #include <glib/gi18n.h>
 
 #define TYPE_FOLDER_ROW (folder_row_get_type())
@@ -105,12 +107,34 @@ static void on_selection_changed(GtkSingleSelection *selection, GParamSpec *pspe
 	}
 }
 
+static void on_right_click(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data)
+{
+	FolderView *folderview = (FolderView *)user_data;
+	GtkWidget *menu_popover;
+	GMenu *menu;
+
+	if (gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture)) == GDK_BUTTON_SECONDARY) {
+		menu = g_menu_new();
+		g_menu_append(menu, _("新着メールのチェック"), "app.inc");
+		g_menu_append(menu, _("新規フォルダの作成..."), "app.folder-new");
+		g_menu_append(menu, _("フォルダ名の変更..."), "app.folder-rename");
+		g_menu_append(menu, _("ごみ箱を空にする"), "app.folder-empty-trash");
+		g_menu_append(menu, _("フォルダのプロパティ..."), "app.folder-prop");
+
+		menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
+		gtk_widget_set_parent(menu_popover, folderview->list_view);
+		gtk_popover_set_pointing_to(GTK_POPOVER(menu_popover), &(const GdkRectangle){(int)x, (int)y, 1, 1});
+		gtk_popover_popup(GTK_POPOVER(menu_popover));
+	}
+}
+
 FolderView *folder_view_create(void)
 {
 	FolderView *folderview;
 	GtkWidget *scrolled_win;
 	GtkListItemFactory *factory;
 	GListStore *store;
+	GtkGesture *right_click_gesture;
 
 	folderview = g_new0(FolderView, 1);
 
@@ -129,6 +153,12 @@ FolderView *folder_view_create(void)
 
 	folderview->list_view = gtk_list_view_new(GTK_SELECTION_MODEL(folderview->selection), factory);
 	g_signal_connect(folderview->selection, "notify::selected", G_CALLBACK(on_selection_changed), folderview);
+
+	/* Right-click Gesture for Context Menu */
+	right_click_gesture = gtk_gesture_click_new();
+	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(right_click_gesture), GDK_BUTTON_SECONDARY);
+	g_signal_connect(right_click_gesture, "pressed", G_CALLBACK(on_right_click), folderview);
+	gtk_widget_add_controller(folderview->list_view, GTK_EVENT_CONTROLLER(right_click_gesture));
 
 	scrolled_win = gtk_scrolled_window_new();
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_win), folderview->list_view);
