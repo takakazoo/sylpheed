@@ -1,4 +1,10 @@
-SUBDIRS = ac libsylph src plugin po manual faq nsis macosx
+if ENABLE_GTK4
+SRC_GTK4_DIR = src-gtk4
+else
+SRC_GTK4_DIR =
+endif
+
+SUBDIRS = ac libsylph src $(SRC_GTK4_DIR) plugin po manual faq nsis macosx
 
 EXTRA_DIST = config.rpath  \
 	ChangeLog.ja \

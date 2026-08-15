@@ -108,6 +108,12 @@ AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
 
 AM_PATH_GTK_2_0(2.8.0,, AC_MSG_ERROR(Test for Gtk failed. See the 'INSTALL' for help.))
 
+dnl Checks for GTK4
+PKG_CHECK_MODULES(GTK4, gtk4 >= 4.10.0, [ac_cv_enable_gtk4=yes], [ac_cv_enable_gtk4=no])
+AM_CONDITIONAL(ENABLE_GTK4, test "$ac_cv_enable_gtk4" = "yes")
+AC_SUBST(GTK4_CFLAGS)
+AC_SUBST(GTK4_LIBS)
+
 dnl --disable-deprecated switch for GTK2 purification
 AC_ARG_ENABLE(deprecated, [  --disable-deprecated    Disable deprecated GTK functions. ],
 			  [GTK_CFLAGS="$GTK_CFLAGS -DG_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED"], [])
@@ -519,6 +525,7 @@ src/version.h
 src/sylpheed.rc
 src/Makefile
 src/icons/Makefile
+src-gtk4/Makefile
 plugin/Makefile
 plugin/attachment_tool/Makefile
 plugin/test/Makefile
