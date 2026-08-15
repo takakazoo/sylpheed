@@ -18,6 +18,14 @@ sylpheed_gtk4_SOURCES = \
 	account_dialog.h \
 	addressbook.c \
 	addressbook.h \
+	editaddress.c \
+	editaddress.h \
+	editgroup.c \
+	editgroup.h \
+	import.c \
+	import.h \
+	export.c \
+	export.h \
 	prefs_dialog.c \
 	prefs_dialog.h \
 	filter_dialog.c \

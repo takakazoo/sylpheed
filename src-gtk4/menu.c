@@ -19,6 +19,8 @@
 #include "alertpanel.h"
 #include "inc.h"
 #include "send_message.h"
+#include "import.h"
+#include "export.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -96,6 +98,18 @@ static void action_folder_empty_trash(GSimpleAction *action, GVariant *parameter
 	alertpanel_notice(mainwin ? GTK_WINDOW(mainwin->window) : NULL, _("ごみ箱を空にする"), _("ごみ箱内のメッセージをすべて消去しました。"));
 }
 
+static void action_import(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	import_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
+}
+
+static void action_export(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	export_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
+}
+
 static void action_search(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	MainWindow *mainwin = (MainWindow *)user_data;
@@ -162,6 +176,8 @@ static const GActionEntry app_entries[] = {
 	{ "folder-new", action_folder_new, NULL, NULL, NULL },
 	{ "folder-rename", action_folder_rename, NULL, NULL, NULL },
 	{ "folder-empty-trash", action_folder_empty_trash, NULL, NULL, NULL },
+	{ "import", action_import, NULL, NULL, NULL },
+	{ "export", action_export, NULL, NULL, NULL },
 	{ "search", action_search, NULL, NULL, NULL },
 	{ "filter", action_filter, NULL, NULL, NULL },
 	{ "preferences", action_preferences, NULL, NULL, NULL },
@@ -205,6 +221,8 @@ GMenuModel *menu_create_main_menu(void)
 	g_menu_append(file_menu, _("新着メールの受信"), "app.inc");
 	g_menu_append(file_menu, _("全アカウントの新着メールを受信"), "app.inc-all");
 	g_menu_append(file_menu, _("新規メッセージの作成"), "app.compose");
+	g_menu_append(file_menu, _("メールのインポート..."), "app.import");
+	g_menu_append(file_menu, _("メールのエクスポート..."), "app.export");
 	g_menu_append(file_menu, _("アカウントの新規作成..."), "app.setup");
 	g_menu_append(file_menu, _("終了"), "app.quit");
 	g_menu_append_submenu(menubar, _("ファイル"), G_MENU_MODEL(file_menu));
@@ -253,6 +271,8 @@ GMenuModel *menu_create_app_menu(void)
 	g_menu_append(section1, _("新着メールの受信"), "app.inc");
 	g_menu_append(section1, _("全アカウントの受信"), "app.inc-all");
 	g_menu_append(section1, _("新規メッセージ作成"), "app.compose");
+	g_menu_append(section1, _("メールのインポート"), "app.import");
+	g_menu_append(section1, _("メールのエクスポート"), "app.export");
 	g_menu_append(section1, _("アカウント新規作成"), "app.setup");
 	g_menu_append_section(menu, NULL, G_MENU_MODEL(section1));
 

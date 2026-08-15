@@ -3,6 +3,8 @@
  */
 
 #include "addressbook.h"
+#include "editaddress.h"
+#include "editgroup.h"
 #include <glib/gi18n.h>
 
 #define TYPE_CONTACT_ITEM (contact_item_get_type())
@@ -74,11 +76,23 @@ static void on_bind_remarks(GtkSignalListItemFactory *factory, GtkListItem *list
 	if (item && label) gtk_label_set_text(GTK_LABEL(label), item->remarks);
 }
 
+static void on_add_contact(GtkButton *btn, gpointer user_data)
+{
+	GtkWindow *win = GTK_WINDOW(user_data);
+	edit_address_dialog_show(win, NULL, NULL, NULL);
+}
+
+static void on_add_group(GtkButton *btn, gpointer user_data)
+{
+	GtkWindow *win = GTK_WINDOW(user_data);
+	edit_group_dialog_show(win, NULL);
+}
+
 void addressbook_window_show(GtkWindow *parent)
 {
 	GtkWidget *win;
 	GtkWidget *header_bar;
-	GtkWidget *btn_add, *btn_delete;
+	GtkWidget *btn_add, *btn_add_grp, *btn_delete;
 	GtkWidget *scrolled_win;
 	GtkWidget *column_view;
 	GListStore *store;
@@ -88,7 +102,7 @@ void addressbook_window_show(GtkWindow *parent)
 
 	win = gtk_window_new();
 	gtk_window_set_title(GTK_WINDOW(win), _("アドレス帳 - Sylpheed GTK4"));
-	gtk_window_set_default_size(GTK_WINDOW(win), 720, 480);
+	gtk_window_set_default_size(GTK_WINDOW(win), 740, 480);
 	if (parent) {
 		gtk_window_set_transient_for(GTK_WINDOW(win), parent);
 	}
@@ -98,7 +112,13 @@ void addressbook_window_show(GtkWindow *parent)
 
 	btn_add = gtk_button_new_with_label(_("新規連絡先"));
 	gtk_button_set_icon_name(GTK_BUTTON(btn_add), "contact-new-symbolic");
+	g_signal_connect(btn_add, "clicked", G_CALLBACK(on_add_contact), win);
 	gtk_header_bar_pack_start(GTK_HEADER_BAR(header_bar), btn_add);
+
+	btn_add_grp = gtk_button_new_with_label(_("グループ追加"));
+	gtk_button_set_icon_name(GTK_BUTTON(btn_add_grp), "system-users-symbolic");
+	g_signal_connect(btn_add_grp, "clicked", G_CALLBACK(on_add_group), win);
+	gtk_header_bar_pack_start(GTK_HEADER_BAR(header_bar), btn_add_grp);
 
 	btn_delete = gtk_button_new();
 	gtk_button_set_icon_name(GTK_BUTTON(btn_delete), "user-trash-symbolic");
@@ -106,7 +126,8 @@ void addressbook_window_show(GtkWindow *parent)
 
 	store = g_list_store_new(TYPE_CONTACT_ITEM);
 	g_list_store_append(store, contact_item_new("Sylpheed Team", "sylpheed@sraoss.jp", "公式サポート"));
-	g_list_store_append(store, contact_item_new("開発チーム", "dev@example.com", "プロジェクトメンバー"));
+	g_list_store_append(store, contact_item_new("開発チーム (Group)", "dev@example.com", "3 名のメンバー"));
+	g_list_store_append(store, contact_item_new("山田 太郎", "yamada@example.com", "同僚"));
 
 	selection = gtk_single_selection_new(G_LIST_MODEL(store));
 	column_view = gtk_column_view_new(GTK_SELECTION_MODEL(selection));
@@ -116,8 +137,8 @@ void addressbook_window_show(GtkWindow *parent)
 	factory = gtk_signal_list_item_factory_new();
 	g_signal_connect(factory, "setup", G_CALLBACK(on_setup_label), NULL);
 	g_signal_connect(factory, "bind", G_CALLBACK(on_bind_name), NULL);
-	col = gtk_column_view_column_new(_("氏名"), factory);
-	gtk_column_view_column_set_fixed_width(col, 200);
+	col = gtk_column_view_column_new(_("氏名 / グループ名"), factory);
+	gtk_column_view_column_set_fixed_width(col, 220);
 	gtk_column_view_column_set_resizable(col, TRUE);
 	gtk_column_view_append_column(GTK_COLUMN_VIEW(column_view), col);
 
