@@ -3,7 +3,11 @@ bin_PROGRAMS = sylpheed-gtk4
 sylpheed_gtk4_SOURCES = \
 	main.c \
 	mainwindow.c \
-	mainwindow.h
+	mainwindow.h \
+	menu.c \
+	menu.h \
+	about.c \
+	about.h
 
 sylpheed_gtk4_CPPFLAGS = \
 	-I$(top_srcdir)/libsylph \
