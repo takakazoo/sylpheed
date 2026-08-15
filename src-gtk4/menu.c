@@ -5,6 +5,8 @@
 #include "menu.h"
 #include "mainwindow.h"
 #include "about.h"
+#include "compose.h"
+#include "prefs_dialog.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -19,17 +21,29 @@ static void action_get_all_mail(GSimpleAction *action, GVariant *parameter, gpoi
 
 static void action_compose(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] 新規作成 (Compose mail)\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	ComposeWindow *compose = compose_window_new(mainwin ? GTK_WINDOW(mainwin->window) : NULL, NULL, NULL, NULL);
+	compose_window_show(compose);
 }
 
 static void action_reply(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] 返信 (Reply)\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	ComposeWindow *compose = compose_window_new(mainwin ? GTK_WINDOW(mainwin->window) : NULL,
+						    "sender@example.com",
+						    "Re: Welcome to Sylpheed GTK4 Preview!",
+						    "\n\n--- Original Message ---\n> Sylpheed の GTK4 プレビュー版へようこそ！\n");
+	compose_window_show(compose);
 }
 
 static void action_forward(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] 転送 (Forward)\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	ComposeWindow *compose = compose_window_new(mainwin ? GTK_WINDOW(mainwin->window) : NULL,
+						    NULL,
+						    "Fw: Welcome to Sylpheed GTK4 Preview!",
+						    "\n\n--- Forwarded Message ---\nFrom: Sylpheed Team <sylpheed@sraoss.jp>\nSubject: Welcome to Sylpheed GTK4 Preview!\n");
+	compose_window_show(compose);
 }
 
 static void action_delete(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -44,7 +58,8 @@ static void action_search(GSimpleAction *action, GVariant *parameter, gpointer u
 
 static void action_preferences(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] 設定 (Preferences)\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	prefs_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
 }
 
 static void action_addressbook(GSimpleAction *action, GVariant *parameter, gpointer user_data)

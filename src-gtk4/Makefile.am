@@ -10,6 +10,10 @@ sylpheed_gtk4_SOURCES = \
 	summaryview.h \
 	messageview.c \
 	messageview.h \
+	compose.c \
+	compose.h \
+	prefs_dialog.c \
+	prefs_dialog.h \
 	menu.c \
 	menu.h \
 	about.c \
