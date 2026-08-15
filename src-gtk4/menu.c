@@ -9,16 +9,20 @@
 #include "prefs_dialog.h"
 #include "setup.h"
 #include "addressbook.h"
+#include "account_dialog.h"
+#include "logwindow.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	g_print("[Action] 受信 (Get mail)\n");
+	log_window_append("[POP3] Connecting to server to check for new mail...\n");
 }
 
 static void action_get_all_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	g_print("[Action] 全受信 (Get all mail)\n");
+	log_window_append("[POP3/IMAP] Checking all accounts for new mail...\n");
 }
 
 static void action_compose(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -64,6 +68,12 @@ static void action_preferences(GSimpleAction *action, GVariant *parameter, gpoin
 	prefs_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
 }
 
+static void action_account_manager(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	account_manager_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
+}
+
 static void action_addressbook(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	MainWindow *mainwin = (MainWindow *)user_data;
@@ -74,6 +84,12 @@ static void action_setup(GSimpleAction *action, GVariant *parameter, gpointer us
 {
 	MainWindow *mainwin = (MainWindow *)user_data;
 	setup_wizard_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
+}
+
+static void action_log(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	log_window_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
 }
 
 static void action_about(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -97,8 +113,10 @@ static const GActionEntry app_entries[] = {
 	{ "delete", action_delete, NULL, NULL, NULL },
 	{ "search", action_search, NULL, NULL, NULL },
 	{ "preferences", action_preferences, NULL, NULL, NULL },
+	{ "account-manager", action_account_manager, NULL, NULL, NULL },
 	{ "addressbook", action_addressbook, NULL, NULL, NULL },
 	{ "setup", action_setup, NULL, NULL, NULL },
+	{ "log", action_log, NULL, NULL, NULL },
 	{ "about", action_about, NULL, NULL, NULL },
 	{ "quit", action_quit, NULL, NULL, NULL }
 };
@@ -150,9 +168,17 @@ GMenuModel *menu_create_main_menu(void)
 	g_menu_append(msg_menu, _("削除"), "app.delete");
 	g_menu_append_submenu(menubar, _("メッセージ"), G_MENU_MODEL(msg_menu));
 
+	/* Configuration Menu */
+	GMenu *config_menu = g_menu_new();
+	g_menu_append(config_menu, _("全般の設定..."), "app.preferences");
+	g_menu_append(config_menu, _("アカウントの設定..."), "app.account-manager");
+	g_menu_append(config_menu, _("アカウントの新規作成..."), "app.setup");
+	g_menu_append_submenu(menubar, _("設定"), G_MENU_MODEL(config_menu));
+
 	/* Tools Menu */
 	GMenu *tool_menu = g_menu_new();
 	g_menu_append(tool_menu, _("アドレス帳"), "app.addressbook");
+	g_menu_append(tool_menu, _("プロトコルログ"), "app.log");
 	g_menu_append_submenu(menubar, _("ツール"), G_MENU_MODEL(tool_menu));
 
 	/* Help Menu */
@@ -176,6 +202,8 @@ GMenuModel *menu_create_app_menu(void)
 	GMenu *section2 = g_menu_new();
 	g_menu_append(section2, _("メッセージ検索"), "app.search");
 	g_menu_append(section2, _("アドレス帳"), "app.addressbook");
+	g_menu_append(section2, _("アカウント設定"), "app.account-manager");
+	g_menu_append(section2, _("プロトコルログ"), "app.log");
 	g_menu_append(section2, _("全般の設定"), "app.preferences");
 	g_menu_append_section(menu, NULL, G_MENU_MODEL(section2));
 

@@ -14,10 +14,14 @@ sylpheed_gtk4_SOURCES = \
 	compose.h \
 	setup.c \
 	setup.h \
+	account_dialog.c \
+	account_dialog.h \
 	addressbook.c \
 	addressbook.h \
 	prefs_dialog.c \
 	prefs_dialog.h \
+	logwindow.c \
+	logwindow.h \
 	menu.c \
 	menu.h \
 	about.c \
