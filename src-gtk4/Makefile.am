@@ -26,6 +26,10 @@ sylpheed_gtk4_SOURCES = \
 	import.h \
 	export.c \
 	export.h \
+	template.c \
+	template.h \
+	printing.c \
+	printing.h \
 	prefs_dialog.c \
 	prefs_dialog.h \
 	filter_dialog.c \

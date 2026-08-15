@@ -21,6 +21,8 @@
 #include "send_message.h"
 #include "import.h"
 #include "export.h"
+#include "template.h"
+#include "printing.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -68,6 +70,17 @@ static void action_delete(GSimpleAction *action, GVariant *parameter, gpointer u
 	alertpanel_notice(mainwin ? GTK_WINDOW(mainwin->window) : NULL, _("削除"), _("選択したメッセージをごみ箱へ移動しました。"));
 }
 
+static void action_print(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	printing_print_message(mainwin ? GTK_WINDOW(mainwin->window) : NULL,
+			       "Sylpheed Team <sylpheed@sraoss.jp>",
+			       "User <user@example.com>",
+			       "Welcome to Sylpheed GTK4 Preview!",
+			       "2026/08/16 08:00",
+			       "Sylpheed GTK4 版からの印刷テストです。\nGTK4 GtkPrintOperation により PDF 保存やプリンタ出力が行えます。\n");
+}
+
 static void action_view_source(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	MainWindow *mainwin = (MainWindow *)user_data;
@@ -108,6 +121,12 @@ static void action_export(GSimpleAction *action, GVariant *parameter, gpointer u
 {
 	MainWindow *mainwin = (MainWindow *)user_data;
 	export_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
+}
+
+static void action_template(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	template_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
 }
 
 static void action_search(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -171,6 +190,7 @@ static const GActionEntry app_entries[] = {
 	{ "reply", action_reply, NULL, NULL, NULL },
 	{ "forward", action_forward, NULL, NULL, NULL },
 	{ "delete", action_delete, NULL, NULL, NULL },
+	{ "print", action_print, NULL, NULL, NULL },
 	{ "view-source", action_view_source, NULL, NULL, NULL },
 	{ "move-to", action_move_to, NULL, NULL, NULL },
 	{ "folder-new", action_folder_new, NULL, NULL, NULL },
@@ -178,6 +198,7 @@ static const GActionEntry app_entries[] = {
 	{ "folder-empty-trash", action_folder_empty_trash, NULL, NULL, NULL },
 	{ "import", action_import, NULL, NULL, NULL },
 	{ "export", action_export, NULL, NULL, NULL },
+	{ "template", action_template, NULL, NULL, NULL },
 	{ "search", action_search, NULL, NULL, NULL },
 	{ "filter", action_filter, NULL, NULL, NULL },
 	{ "preferences", action_preferences, NULL, NULL, NULL },
@@ -199,6 +220,7 @@ void menu_init_actions(GtkApplication *app, gpointer mainwin)
 	const char *accel_inc_all[] = { "<Primary><Shift>i", NULL };
 	const char *accel_compose[] = { "<Primary>n", NULL };
 	const char *accel_search[] = { "<Primary>f", NULL };
+	const char *accel_print[] = { "<Primary>p", NULL };
 	const char *accel_source[] = { "<Primary>u", NULL };
 	const char *accel_quit[] = { "<Primary>q", NULL };
 	const char *accel_delete[] = { "Delete", NULL };
@@ -207,6 +229,7 @@ void menu_init_actions(GtkApplication *app, gpointer mainwin)
 	gtk_application_set_accels_for_action(app, "app.inc-all", accel_inc_all);
 	gtk_application_set_accels_for_action(app, "app.compose", accel_compose);
 	gtk_application_set_accels_for_action(app, "app.search", accel_search);
+	gtk_application_set_accels_for_action(app, "app.print", accel_print);
 	gtk_application_set_accels_for_action(app, "app.view-source", accel_source);
 	gtk_application_set_accels_for_action(app, "app.quit", accel_quit);
 	gtk_application_set_accels_for_action(app, "app.delete", accel_delete);
@@ -223,6 +246,7 @@ GMenuModel *menu_create_main_menu(void)
 	g_menu_append(file_menu, _("新規メッセージの作成"), "app.compose");
 	g_menu_append(file_menu, _("メールのインポート..."), "app.import");
 	g_menu_append(file_menu, _("メールのエクスポート..."), "app.export");
+	g_menu_append(file_menu, _("メッセージの印刷..."), "app.print");
 	g_menu_append(file_menu, _("アカウントの新規作成..."), "app.setup");
 	g_menu_append(file_menu, _("終了"), "app.quit");
 	g_menu_append_submenu(menubar, _("ファイル"), G_MENU_MODEL(file_menu));
@@ -246,6 +270,7 @@ GMenuModel *menu_create_main_menu(void)
 	GMenu *config_menu = g_menu_new();
 	g_menu_append(config_menu, _("全般の設定..."), "app.preferences");
 	g_menu_append(config_menu, _("アカウントの設定..."), "app.account-manager");
+	g_menu_append(config_menu, _("テンプレートの設定..."), "app.template");
 	g_menu_append(config_menu, _("アカウントの新規作成..."), "app.setup");
 	g_menu_append_submenu(menubar, _("設定"), G_MENU_MODEL(config_menu));
 
@@ -273,12 +298,14 @@ GMenuModel *menu_create_app_menu(void)
 	g_menu_append(section1, _("新規メッセージ作成"), "app.compose");
 	g_menu_append(section1, _("メールのインポート"), "app.import");
 	g_menu_append(section1, _("メールのエクスポート"), "app.export");
+	g_menu_append(section1, _("メッセージの印刷"), "app.print");
 	g_menu_append(section1, _("アカウント新規作成"), "app.setup");
 	g_menu_append_section(menu, NULL, G_MENU_MODEL(section1));
 
 	GMenu *section2 = g_menu_new();
 	g_menu_append(section2, _("メッセージ検索"), "app.search");
 	g_menu_append(section2, _("振り分け設定"), "app.filter");
+	g_menu_append(section2, _("テンプレート設定"), "app.template");
 	g_menu_append(section2, _("アドレス帳"), "app.addressbook");
 	g_menu_append(section2, _("アカウント設定"), "app.account-manager");
 	g_menu_append(section2, _("プロトコルログ"), "app.log");

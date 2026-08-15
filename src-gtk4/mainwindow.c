@@ -4,6 +4,7 @@
 
 #include "mainwindow.h"
 #include "menu.h"
+#include "printing.h"
 #include <glib/gi18n.h>
 
 static void on_message_selected(SummaryView *summaryview, MsgItem *item, gpointer user_data)
@@ -38,18 +39,53 @@ static void on_folder_selected(FolderView *folderview, FolderItem *item, gpointe
 	}
 }
 
+/* Space Navigation (Sylpheed-style Fast Keyboard Reading) */
+static gboolean on_window_key_pressed(GtkEventControllerKey *controller,
+				      guint keyval,
+				      guint keycode,
+				      GdkModifierType state,
+				      gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+
+	if (keyval == GDK_KEY_space) {
+		if (state & GDK_SHIFT_MASK) {
+			/* Shift+Space: Scroll up or previous message */
+			if (mainwin && mainwin->summaryview && mainwin->summaryview->selection) {
+				guint current = gtk_single_selection_get_selected(mainwin->summaryview->selection);
+				if (current > 0) {
+					gtk_single_selection_set_selected(mainwin->summaryview->selection, current - 1);
+				}
+			}
+		} else {
+			/* Space: Next unread or next message */
+			if (mainwin && mainwin->summaryview && mainwin->summaryview->selection) {
+				guint current = gtk_single_selection_get_selected(mainwin->summaryview->selection);
+				guint n_items = g_list_model_get_n_items(G_LIST_MODEL(mainwin->summaryview->filter_model));
+				if (current + 1 < n_items) {
+					gtk_single_selection_set_selected(mainwin->summaryview->selection, current + 1);
+				}
+			}
+		}
+		return GDK_EVENT_STOP;
+	}
+
+	return GDK_EVENT_PROPAGATE;
+}
+
 MainWindow *main_window_create(GtkApplication *app)
 {
 	MainWindow *mainwin;
 	GtkWidget *win;
 	GtkWidget *header_bar;
-	GtkWidget *btn_get, *btn_compose, *btn_reply, *btn_forward, *btn_delete;
+	GtkWidget *btn_get, *btn_compose, *btn_reply, *btn_forward, *btn_delete, *btn_print;
 	GtkWidget *btn_menu;
 	GtkWidget *paned_h, *paned_v;
 	GtkWidget *vbox;
 	GtkWidget *menubar;
 	GMenuModel *app_menu_model;
 	GMenuModel *main_menu_model;
+	GtkEventController *key_controller;
 
 	mainwin = g_new0(MainWindow, 1);
 
@@ -61,6 +97,11 @@ MainWindow *main_window_create(GtkApplication *app)
 	gtk_window_set_title(GTK_WINDOW(win), "Sylpheed (GTK4 Preview)");
 	gtk_window_set_default_size(GTK_WINDOW(win), 1180, 760);
 	mainwin->window = GTK_APPLICATION_WINDOW(win);
+
+	/* Add Space Navigation Key Controller */
+	key_controller = gtk_event_controller_key_new();
+	g_signal_connect(key_controller, "key-pressed", G_CALLBACK(on_window_key_pressed), mainwin);
+	gtk_widget_add_controller(win, key_controller);
 
 	/* Header Bar (Modern Titlebar with Tools) */
 	header_bar = gtk_header_bar_new();
@@ -91,6 +132,12 @@ MainWindow *main_window_create(GtkApplication *app)
 	gtk_actionable_set_action_name(GTK_ACTIONABLE(btn_forward), "app.forward");
 	gtk_widget_set_tooltip_text(btn_forward, _("転送"));
 	gtk_header_bar_pack_start(GTK_HEADER_BAR(header_bar), btn_forward);
+
+	btn_print = gtk_button_new();
+	gtk_button_set_icon_name(GTK_BUTTON(btn_print), "printer-symbolic");
+	gtk_actionable_set_action_name(GTK_ACTIONABLE(btn_print), "app.print");
+	gtk_widget_set_tooltip_text(btn_print, _("印刷 (Ctrl+P)"));
+	gtk_header_bar_pack_start(GTK_HEADER_BAR(header_bar), btn_print);
 
 	btn_delete = gtk_button_new();
 	gtk_button_set_icon_name(GTK_BUTTON(btn_delete), "user-trash-symbolic");
@@ -150,7 +197,7 @@ MainWindow *main_window_create(GtkApplication *app)
 	gtk_widget_set_margin_top(mainwin->status_bar, 4);
 	gtk_widget_set_margin_bottom(mainwin->status_bar, 4);
 
-	mainwin->status_label = gtk_label_new(_("3 通のメッセージ (未読 1 通) | Sylpheed GTK4"));
+	mainwin->status_label = gtk_label_new(_("3 通のメッセージ (未読 1 通) | スペースキーで次未読へ進む"));
 	gtk_box_append(GTK_BOX(mainwin->status_bar), mainwin->status_label);
 	gtk_box_append(GTK_BOX(vbox), mainwin->status_bar);
 
