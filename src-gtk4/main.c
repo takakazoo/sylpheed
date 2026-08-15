@@ -14,8 +14,35 @@
 
 static MainWindow *static_mainwindow = NULL;
 
+static void load_custom_css(void)
+{
+	GtkCssProvider *provider = gtk_css_provider_new();
+	const char *css_data =
+		"label.badge {\n"
+		"    background-color: #1a73e8;\n"
+		"    color: white;\n"
+		"    font-weight: bold;\n"
+		"    font-size: 11px;\n"
+		"    border-radius: 10px;\n"
+		"    padding: 1px 7px;\n"
+		"    margin-start: 4px;\n"
+		"}\n"
+		"label.dim-label {\n"
+		"    opacity: 0.65;\n"
+		"    font-weight: 500;\n"
+		"}\n";
+
+	gtk_css_provider_load_from_string(provider, css_data);
+	gtk_style_context_add_provider_for_display(gdk_display_get_default(),
+						   GTK_STYLE_PROVIDER(provider),
+						   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	g_object_unref(provider);
+}
+
 static void on_activate(GtkApplication *app, gpointer user_data)
 {
+	load_custom_css();
+
 	if (!static_mainwindow) {
 		static_mainwindow = main_window_create(app);
 	}

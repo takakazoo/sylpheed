@@ -6,11 +6,27 @@
 #include "menu.h"
 #include <glib/gi18n.h>
 
-static void on_message_selected(SummaryView *summaryview, const char *msg_body, gpointer user_data)
+static void on_message_selected(SummaryView *summaryview, MsgItem *item, gpointer user_data)
 {
 	MainWindow *mainwin = (MainWindow *)user_data;
-	if (mainwin && mainwin->messageview) {
-		message_view_set_text(mainwin->messageview, msg_body);
+	if (mainwin && mainwin->messageview && item) {
+		message_view_set_message(mainwin->messageview,
+					 item->from,
+					 item->to,
+					 item->subject,
+					 item->date,
+					 item->body,
+					 item->attach_file,
+					 item->attach_size);
+
+		if (mainwin->status_label) {
+			gchar *status_str = g_strdup_printf(_("選択中: %s (%s) | 未読: %s"),
+							    item->subject ? item->subject : "(No Subject)",
+							    item->size ? item->size : "0 KB",
+							    item->unread ? _("はい") : _("いいえ"));
+			gtk_label_set_text(GTK_LABEL(mainwin->status_label), status_str);
+			g_free(status_str);
+		}
 	}
 }
 
@@ -43,7 +59,7 @@ MainWindow *main_window_create(GtkApplication *app)
 	/* Main Window */
 	win = gtk_application_window_new(app);
 	gtk_window_set_title(GTK_WINDOW(win), "Sylpheed (GTK4 Preview)");
-	gtk_window_set_default_size(GTK_WINDOW(win), 1120, 740);
+	gtk_window_set_default_size(GTK_WINDOW(win), 1180, 760);
 	mainwin->window = GTK_APPLICATION_WINDOW(win);
 
 	/* Header Bar (Modern Titlebar with Tools) */
@@ -94,7 +110,7 @@ MainWindow *main_window_create(GtkApplication *app)
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	gtk_window_set_child(GTK_WINDOW(win), vbox);
 
-	/* Optional Top Menu Bar */
+	/* Top Menu Bar */
 	main_menu_model = menu_create_main_menu();
 	menubar = gtk_popover_menu_bar_new_from_model(main_menu_model);
 	gtk_box_append(GTK_BOX(vbox), menubar);
@@ -114,16 +130,16 @@ MainWindow *main_window_create(GtkApplication *app)
 
 	/* Right Vertical Paned */
 	paned_v = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
-	gtk_paned_set_position(GTK_PANED(paned_v), 320);
+	gtk_paned_set_position(GTK_PANED(paned_v), 340);
 	gtk_paned_set_end_child(GTK_PANED(paned_h), paned_v);
 	mainwin->paned_sub = paned_v;
 
-	/* 2. Top Right Pane: Summary View (Mail List) */
+	/* 2. Top Right Pane: Summary View (Mail List with Quick Search) */
 	mainwin->summaryview = summary_view_create();
 	summary_view_set_selected_callback(mainwin->summaryview, on_message_selected, mainwin);
 	gtk_paned_set_start_child(GTK_PANED(paned_v), mainwin->summaryview->container);
 
-	/* 3. Bottom Right Pane: Message View (Preview) */
+	/* 3. Bottom Right Pane: Message View (Preview with Header Panel and Attach Chips) */
 	mainwin->messageview = message_view_create();
 	gtk_paned_set_end_child(GTK_PANED(paned_v), mainwin->messageview->container);
 
@@ -134,7 +150,7 @@ MainWindow *main_window_create(GtkApplication *app)
 	gtk_widget_set_margin_top(mainwin->status_bar, 4);
 	gtk_widget_set_margin_bottom(mainwin->status_bar, 4);
 
-	mainwin->status_label = gtk_label_new(_("2 通のメッセージ (Sylpheed GTK4)"));
+	mainwin->status_label = gtk_label_new(_("3 通のメッセージ (未読 1 通) | Sylpheed GTK4"));
 	gtk_box_append(GTK_BOX(mainwin->status_bar), mainwin->status_label);
 	gtk_box_append(GTK_BOX(vbox), mainwin->status_bar);
 
