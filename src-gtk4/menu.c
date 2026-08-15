@@ -7,6 +7,8 @@
 #include "about.h"
 #include "compose.h"
 #include "prefs_dialog.h"
+#include "setup.h"
+#include "addressbook.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -64,7 +66,14 @@ static void action_preferences(GSimpleAction *action, GVariant *parameter, gpoin
 
 static void action_addressbook(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] アドレス帳 (Address Book)\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	addressbook_window_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
+}
+
+static void action_setup(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	setup_wizard_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
 }
 
 static void action_about(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -89,6 +98,7 @@ static const GActionEntry app_entries[] = {
 	{ "search", action_search, NULL, NULL, NULL },
 	{ "preferences", action_preferences, NULL, NULL, NULL },
 	{ "addressbook", action_addressbook, NULL, NULL, NULL },
+	{ "setup", action_setup, NULL, NULL, NULL },
 	{ "about", action_about, NULL, NULL, NULL },
 	{ "quit", action_quit, NULL, NULL, NULL }
 };
@@ -123,6 +133,7 @@ GMenuModel *menu_create_main_menu(void)
 	g_menu_append(file_menu, _("新着メールの受信"), "app.inc");
 	g_menu_append(file_menu, _("全アカウントの新着メールを受信"), "app.inc-all");
 	g_menu_append(file_menu, _("新規メッセージの作成"), "app.compose");
+	g_menu_append(file_menu, _("アカウントの新規作成..."), "app.setup");
 	g_menu_append(file_menu, _("終了"), "app.quit");
 	g_menu_append_submenu(menubar, _("ファイル"), G_MENU_MODEL(file_menu));
 
@@ -159,6 +170,7 @@ GMenuModel *menu_create_app_menu(void)
 	g_menu_append(section1, _("新着メールの受信"), "app.inc");
 	g_menu_append(section1, _("全アカウントの受信"), "app.inc-all");
 	g_menu_append(section1, _("新規メッセージ作成"), "app.compose");
+	g_menu_append(section1, _("アカウント新規作成"), "app.setup");
 	g_menu_append_section(menu, NULL, G_MENU_MODEL(section1));
 
 	GMenu *section2 = g_menu_new();

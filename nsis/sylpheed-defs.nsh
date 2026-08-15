@@ -18,13 +18,25 @@ Unicode true
 !define MEMENTO_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
 
 !ifdef SYLPHEED_PRO
+!ifndef INST_NAME
 !define INST_NAME "Sylpheed Pro"
+!endif
+!ifndef INST_VERSION
 !define INST_VERSION "2.6"
+!endif
+!ifndef INST_FILENAME
 !define INST_FILENAME "Sylpheed_Pro"
+!endif
 !else
+!ifndef INST_NAME
 !define INST_NAME ${PRODUCT_NAME}
+!endif
+!ifndef INST_VERSION
 !define INST_VERSION ${PRODUCT_VERSION}
+!endif
+!ifndef INST_FILENAME
 !define INST_FILENAME ${PRODUCT_NAME}
+!endif
 !endif
 
 !define ORIG_WEB_SITE "http://sylpheed.sraoss.jp/"
