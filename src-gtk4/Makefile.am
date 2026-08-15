@@ -20,6 +20,10 @@ sylpheed_gtk4_SOURCES = \
 	addressbook.h \
 	prefs_dialog.c \
 	prefs_dialog.h \
+	filter_dialog.c \
+	filter_dialog.h \
+	search_dialog.c \
+	search_dialog.h \
 	logwindow.c \
 	logwindow.h \
 	menu.c \

@@ -11,6 +11,8 @@
 #include "addressbook.h"
 #include "account_dialog.h"
 #include "logwindow.h"
+#include "filter_dialog.h"
+#include "search_dialog.h"
 #include <glib/gi18n.h>
 
 static void action_get_mail(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -59,7 +61,14 @@ static void action_delete(GSimpleAction *action, GVariant *parameter, gpointer u
 
 static void action_search(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[Action] メッセージ検索 (Search)\n");
+	MainWindow *mainwin = (MainWindow *)user_data;
+	search_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
+}
+
+static void action_filter(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	MainWindow *mainwin = (MainWindow *)user_data;
+	filter_dialog_show(mainwin ? GTK_WINDOW(mainwin->window) : NULL);
 }
 
 static void action_preferences(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -112,6 +121,7 @@ static const GActionEntry app_entries[] = {
 	{ "forward", action_forward, NULL, NULL, NULL },
 	{ "delete", action_delete, NULL, NULL, NULL },
 	{ "search", action_search, NULL, NULL, NULL },
+	{ "filter", action_filter, NULL, NULL, NULL },
 	{ "preferences", action_preferences, NULL, NULL, NULL },
 	{ "account-manager", action_account_manager, NULL, NULL, NULL },
 	{ "addressbook", action_addressbook, NULL, NULL, NULL },
@@ -178,6 +188,7 @@ GMenuModel *menu_create_main_menu(void)
 	/* Tools Menu */
 	GMenu *tool_menu = g_menu_new();
 	g_menu_append(tool_menu, _("アドレス帳"), "app.addressbook");
+	g_menu_append(tool_menu, _("振り分けの設定..."), "app.filter");
 	g_menu_append(tool_menu, _("プロトコルログ"), "app.log");
 	g_menu_append_submenu(menubar, _("ツール"), G_MENU_MODEL(tool_menu));
 
@@ -201,6 +212,7 @@ GMenuModel *menu_create_app_menu(void)
 
 	GMenu *section2 = g_menu_new();
 	g_menu_append(section2, _("メッセージ検索"), "app.search");
+	g_menu_append(section2, _("振り分け設定"), "app.filter");
 	g_menu_append(section2, _("アドレス帳"), "app.addressbook");
 	g_menu_append(section2, _("アカウント設定"), "app.account-manager");
 	g_menu_append(section2, _("プロトコルログ"), "app.log");
